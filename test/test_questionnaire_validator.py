@@ -1,6 +1,6 @@
 import pytest
 
-from src.dataclasses import Question, Answer, AnsweredQuestion
+from src.dataclasses import Answer, AnsweredQuestion, Question
 from src.exceptions import UnansweredQuestionError
 from src.questionnaire_validator import QuestionnaireValidator
 

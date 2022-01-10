@@ -1,11 +1,7 @@
 import pytest
 
 from src.dataclasses import Answer
-from src.exceptions import (
-    NotAQuestionError,
-    NotAnAnswerError,
-    NoCorrectAnswerError,
-)
+from src.exceptions import NoCorrectAnswerError, NotAnAnswerError, NotAQuestionError
 from src.questionnaire_parser import QuestionnaireParser
 
 
@@ -31,8 +27,7 @@ def questionnaire_lines():
 class TestQuestionnaireParser:
     def test_parse_questionnaire_parses_all_questions(self, questionnaire_lines):
         questionnaire = QuestionnaireParser.parse_questionnaire(
-            questionnaire_name="test_name",
-            questionnaire_lines=questionnaire_lines
+            questionnaire_name="test_name", questionnaire_lines=questionnaire_lines
         )
 
         assert len(questionnaire.questions) == 4

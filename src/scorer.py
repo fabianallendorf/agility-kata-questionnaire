@@ -1,4 +1,4 @@
-from src.dataclasses import ValidatedQuestion, Score
+from src.dataclasses import Score, ValidatedQuestion
 
 
 def collect_statistics(validated_questions: list[ValidatedQuestion]) -> Score:

@@ -26,7 +26,9 @@ def corrected_answer(answer_text: str) -> str:
     return f"The correct answer is: '{answer_text}'"
 
 
-def score_text(correct_count: int, questions_count: int, percentage_correct: float) -> str:
+def score_text(
+    correct_count: int, questions_count: int, percentage_correct: float
+) -> str:
     return (
         f"{correct_count} out of {questions_count} "
         f"questions answered correctly ({percentage_correct:.0%})"

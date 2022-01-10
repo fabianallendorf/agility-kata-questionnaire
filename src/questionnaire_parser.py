@@ -1,10 +1,6 @@
-from src.dataclasses import Question, Answer, Questionnaire
-from src.exceptions import (
-    NotAnAnswerError,
-    NotAQuestionError,
-    NoCorrectAnswerError,
-)
 from src import markers
+from src.dataclasses import Answer, Question, Questionnaire
+from src.exceptions import NoCorrectAnswerError, NotAnAnswerError, NotAQuestionError
 
 
 class QuestionnaireParser:

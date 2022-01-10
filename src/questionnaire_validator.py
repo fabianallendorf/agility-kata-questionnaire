@@ -1,6 +1,6 @@
 from itertools import chain
 
-from src.dataclasses import Question, Answer, AnsweredQuestion, ValidatedQuestion
+from src.dataclasses import Answer, AnsweredQuestion, Question, ValidatedQuestion
 from src.exceptions import UnansweredQuestionError
 
 

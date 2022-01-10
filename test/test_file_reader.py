@@ -1,6 +1,7 @@
-from src.file_reader import read_file
 import test.files
 from importlib import resources
+
+from src.file_reader import read_file
 
 
 def test_read_empty_file():

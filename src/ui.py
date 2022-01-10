@@ -1,10 +1,10 @@
 import random
 import tkinter as tk
 from functools import partial
-from tkinter import ttk, messagebox
+from tkinter import messagebox, ttk
 
 from src import strings
-from src.dataclasses import ValidatedQuestion, Score, Questionnaire
+from src.dataclasses import Questionnaire, Score, ValidatedQuestion
 from src.exceptions import UnansweredQuestionError
 from src.questionnaire_validator import QuestionnaireValidator
 from src.scorer import collect_statistics
@@ -45,7 +45,9 @@ class GridUIMixin:
         return element
 
     def add_separator(self, column=0, orient="horizontal", *args, **kwargs):
-        element = ttk.Separator(master=self, orient=orient, *args, **kwargs).grid(  # noqa
+        element = ttk.Separator(
+            master=self, orient=orient, *args, **kwargs
+        ).grid(  # noqa
             column=column, row=self.current_row, sticky="ew", pady=10
         )
         self.current_row += 1
