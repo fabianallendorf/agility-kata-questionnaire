@@ -43,7 +43,6 @@ class TestQuestionnaireParser:
         _, question = QuestionnaireParser.parse_question(
             questionnaire_lines=questionnaire_lines,
             current_line_index=7,
-            max_line_index=11,
         )
 
         assert len(question.correct_answers) == 1

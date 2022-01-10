@@ -4,18 +4,21 @@ from src.exceptions import (
     NotAQuestionError,
     NotExactlyOneCorrectAnswerError,
 )
+from src import markers
 
 
 class QuestionnaireParser:
     @classmethod
     def parse_questionnaire(cls, questionnaire_lines: list[str]) -> list[Question]:
-        questions = []
         current_line_index = 0
-        max_line_index = len(questionnaire_lines)
-        while current_line_index < max_line_index:
-            current_line_index, question = cls.parse_question(
-                questionnaire_lines, current_line_index, max_line_index
-            )
+        questions = []
+        while True:
+            try:
+                current_line_index, question = cls.parse_question(
+                    questionnaire_lines, current_line_index,
+                )
+            except IndexError:
+                break
             questions.append(question)
         return questions
 
@@ -24,20 +27,19 @@ class QuestionnaireParser:
         cls,
         questionnaire_lines: list[str],
         current_line_index: int,
-        max_line_index: int,
     ) -> tuple[int, Question]:
         current_line_index, question_text = cls.read_question_text(
             questionnaire_lines, current_line_index
         )
         parsed_answers = []
-        while current_line_index < max_line_index:
+        while True:
             try:
                 (
                     current_line_index,
                     answer,
                     is_correct_for_current_question,
                 ) = cls.parse_answer(questionnaire_lines, current_line_index)
-            except NotAnAnswerError:
+            except (NotAnAnswerError, IndexError):
                 break
             parsed_answers.append((answer, is_correct_for_current_question))
         question = cls.build_question(question_text, parsed_answers)
@@ -68,14 +70,6 @@ class QuestionnaireParser:
         return current_line_index, Answer(text=txt), is_correct_for_current_question
 
     @staticmethod
-    def _is_question(txt: str) -> bool:
-        return txt.startswith("?")
-
-    @staticmethod
-    def _is_correct(txt: str) -> bool:
-        return txt.startswith("*")
-
-    @staticmethod
     def build_question(
         question_text: str, parsed_answers: list[tuple[Answer, bool]]
     ) -> Question:
@@ -96,3 +90,11 @@ class QuestionnaireParser:
             correct_answers=correct_answers,
             incorrect_answers=incorrect_answers,
         )
+
+    @staticmethod
+    def _is_question(txt: str) -> bool:
+        return txt.startswith(markers.QUESTION_MARKER)
+
+    @staticmethod
+    def _is_correct(txt: str) -> bool:
+        return txt.startswith(markers.CORRECT_ANSWER_MARKER)
