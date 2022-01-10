@@ -1,6 +1,7 @@
 SHOW_RESULTS = "Be hopeful"
 QUIT = "Abandon hope"
 SELECT_QUESTIONNAIRE = "Choose hope"
+DONT_KNOW = "I am hopeless"
 
 UNANSWERED_QUESTION_ERROR_TITLE = "Missing answer"
 UNANSWERED_QUESTION_ERROR_MESSAGE = "Some required questions were not answered."
