@@ -1,9 +1,10 @@
 import random
 import tkinter as tk
+from functools import partial
 from tkinter import ttk, messagebox
 
 from src import strings
-from src.dataclasses import Question, Answer, ValidatedQuestion, Score
+from src.dataclasses import Question, ValidatedQuestion, Score
 from src.exceptions import UnansweredQuestionError
 from src.questionnaire_validator import QuestionnaireValidator
 from src.scorer import collect_statistics
@@ -156,6 +157,7 @@ class ResultUI(GridUIMixin, ttk.Frame):
                 self._display_incorrectly_answered(validated_question)
                 self._display_correct_answer(question)
             self._display_separator()
+        self._display_buttons()
 
     def _display_separator(self):
         self.add_separator(orient="horizontal", column=1)
@@ -184,3 +186,10 @@ class ResultUI(GridUIMixin, ttk.Frame):
             f"questions answered correctly ({self.score.percentage_correct:.0%})"
         )
         self.add_label(text=score_text, column=1)
+
+    def _display_buttons(self):
+        button_frame = ttk.Frame(master=self)
+        button_frame.grid(column=1, row=self.current_row)
+        questions = [q.answered_question.question for q in self.validated_questions]
+        ttk.Button(master=button_frame, text="A new hope", command=partial(self.master.display_questionnaire, questions)).grid(column=0, row=0)
+        ttk.Button(master=button_frame, text="Abandon hope", command=self.quit).grid(column=1, row=0)
