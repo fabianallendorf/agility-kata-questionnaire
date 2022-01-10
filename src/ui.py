@@ -1,12 +1,10 @@
 import random
 import tkinter as tk
-from functools import partial
 from tkinter import ttk, messagebox
 
 from src import strings
-from src.dataclasses import Question, Answer, ValidatedQuestion
+from src.dataclasses import Question, ValidatedQuestion, Questionnaire
 from src.exceptions import UnansweredQuestionError
-from src.questionnaire_parser import QuestionnaireParser
 from src.questionnaire_validator import QuestionnaireValidator
 
 
@@ -15,13 +13,13 @@ class MainUI(tk.Tk):
         super().__init__(*args, **kwargs)
         self.page = None
 
-    def display_questionnaire_selection(self, questionnaire_dict):
+    def display_questionnaire_selection(self, questionnaires: list[Questionnaire]):
         if self.page:
             self.page.destroy()
-        self.page = SelectionUI(questionnaire_dict, master=self)
+        self.page = SelectionUI(questionnaires, master=self)
         self.page.display_questionnaire_selection()
 
-    def display_questionnaire(self, questions):
+    def display_questionnaire(self, questions: list[Question]):
         if self.page:
             self.page.destroy()
         self.page = QuestionnaireUI(questions=questions, master=self)
@@ -35,27 +33,27 @@ class MainUI(tk.Tk):
 
 
 class SelectionUI(ttk.Frame):
-    def __init__(self, questionnaire_dict: dict[str, list[str]], master=None):
+    def __init__(self, questionnaires: list[Questionnaire], master=None):
         super().__init__(master=master)
         self._root().title(strings.SHOW_RESULTS)  # noqa
         self.grid()
         self.current_row = 0
-        self.questionnaire_dict = questionnaire_dict
+        self.questionnaires = questionnaires
         self.questionnaire_selection = tk.StringVar()
 
     def display_questionnaire_selection(self):
-        for questionnare_name in self.questionnaire_dict.keys():
-            self._display_questionnaire_information(questionnare_name)
+        for questionnaire in self.questionnaires:
+            self._display_questionnaire_information(questionnaire)
         self._display_buttons()
 
-    def _display_questionnaire_information(self, questionnaire_name: str):
+    def _display_questionnaire_information(self, questionnaire: Questionnaire):
         ttk.Label(master=self, text="\n").grid(column=1, row=self.current_row)
         self.current_row += 1
         ttk.Radiobutton(
             master=self,
-            text=questionnaire_name,
+            text=questionnaire.name,
             variable=self.questionnaire_selection,
-            value=questionnaire_name
+            value=questionnaire.name
         ).grid(column=1, row=self.current_row)
         self.current_row += 1
 
@@ -76,15 +74,8 @@ class SelectionUI(ttk.Frame):
         selection = self.questionnaire_selection.get()
         if not selection:
             return
-        questionnaire_lines = self.questionnaire_dict[selection]
-        questions = QuestionnaireParser.parse_questionnaire(questionnaire_lines=questionnaire_lines)
-        if len(questions) == 0:
-            messagebox.showerror(
-                strings.NO_QUESTIONS_ERROR_TITLE,
-                strings.NO_QUESTIONS_ERROR_MESSAGE,
-            )
-            return
-        self.master.display_questionnaire(questions)
+        questionnaire = [questionnaire for questionnaire in self.questionnaires if questionnaire.name == selection][0]
+        self.master.display_questionnaire(questionnaire.questions)
 
 
 class QuestionnaireUI(ttk.Frame):

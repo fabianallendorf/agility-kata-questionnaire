@@ -33,3 +33,9 @@ class Score:
     questions_count: int
     correct_questions_count: int
     percentage_correct: float
+
+
+@dataclass
+class Questionnaire:
+    name: str
+    questions: list[Question]
