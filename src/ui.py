@@ -210,15 +210,18 @@ class ResultUI(GridUIMixin, ttk.Frame):
     def display_results(self):
         self._display_score()
         for validated_question in self.validated_questions:
-            question = validated_question.answered_question.question
-            self.add_separator()
-            self.add_label(text=question.text)
-            if validated_question.is_correct:
-                self._display_correctly_answered(validated_question)
-            else:
-                self._display_incorrectly_answered(validated_question)
-                self._display_correct_answer(question)
+            self._display_question(validated_question)
         self._display_buttons()
+
+    def _display_question(self, validated_question):
+        question = validated_question.answered_question.question
+        self.add_separator()
+        self.add_label(text=question.text)
+        if validated_question.is_correct:
+            self._display_correctly_answered(validated_question)
+        else:
+            self._display_incorrectly_answered(validated_question)
+            self._display_correct_answer(question)
 
     def _display_correctly_answered(self, validated_question: ValidatedQuestion):
         answer_text = ", ".join(
