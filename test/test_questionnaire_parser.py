@@ -116,5 +116,9 @@ class TestQuestionnaireParser:
         )
 
         assert question.text == "question_text"
-        assert question.correct_answers == [answer for answer, is_correct in parsed_answers if is_correct]
-        assert question.incorrect_answers == [answer for answer, is_correct in parsed_answers if not is_correct]
+        assert question.correct_answers == [
+            answer for answer, is_correct in parsed_answers if is_correct
+        ]
+        assert question.incorrect_answers == [
+            answer for answer, is_correct in parsed_answers if not is_correct
+        ]

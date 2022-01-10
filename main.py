@@ -3,7 +3,7 @@ from importlib import resources
 import test.files
 from src.file_reader import read_file
 from src.questionnaire_parser import QuestionnaireParser
-from src.ui import QuestionnaireUI
+from src.ui import QuestionnaireUI, MainUI
 
 
 def main():
@@ -13,7 +13,7 @@ def main():
     parser = QuestionnaireParser()
     questions = parser.parse_questionnaire(questionnaire_lines=questionnaire_lines)
 
-    ui = QuestionnaireUI()
+    ui = MainUI()
     ui.display_questionnaire(questions)
     ui.mainloop()
 

@@ -15,7 +15,8 @@ class QuestionnaireParser:
         while True:
             try:
                 current_line_index, question = cls.parse_question(
-                    questionnaire_lines, current_line_index,
+                    questionnaire_lines,
+                    current_line_index,
                 )
             except IndexError:
                 break

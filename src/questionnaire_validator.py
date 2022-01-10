@@ -18,9 +18,19 @@ class QuestionnaireValidator:
                 raise UnansweredQuestionError(unanswered_question=question)
 
     @staticmethod
-    def validate_answers(questions: list[Question], user_answers: list[Answer]):
+    def validate_answers(questions: list[Question], user_answers: list[Answer]) -> list[ValidatedQuestion]:
+        validated_questions = []
         for question in questions:
-            QuestionnaireValidator.validate_answer(question, user_answers)
+            validated_question = QuestionnaireValidator.validate_answer(question, user_answers)
+            validated_questions.append(validated_question)
+
+        return validated_questions
+
+    @staticmethod
+    def validate_answer(question: Question, user_answers: list[Answer]):
+        answered_question = QuestionnaireValidator.select_answers_for_question(question, user_answers)
+        validated_answer = QuestionnaireValidator.check_is_answered_correctly(answered_question)
+        return validated_answer
 
     @staticmethod
     def select_answers_for_question(

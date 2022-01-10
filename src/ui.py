@@ -1,29 +1,47 @@
 import random
 import tkinter as tk
-from functools import partial
 from tkinter import ttk, messagebox
 
 from src import strings
-from src.dataclasses import Question, Answer
+from src.dataclasses import Question, Answer, ValidatedQuestion
 from src.exceptions import UnansweredQuestionError
 from src.questionnaire_validator import QuestionnaireValidator
 
 
+class MainUI(tk.Tk):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.questionnaire = None
+        self.results = None
+
+    def display_questionnaire(self, questions):
+        self.questionnaire = QuestionnaireUI(questions=questions, master=self)
+        self.questionnaire.display_questionnaire()
+
+    def show_results(self, validated_questions: list[ValidatedQuestion]):
+        if self.questionnaire:
+            self.questionnaire.destroy()
+            self.questionnaire = None
+        self.results = ResultUI(validated_questions=validated_questions, master=self)
+        self.results.display_results()
+
+
 class QuestionnaireUI(ttk.Frame):
-    def __init__(self, master=None):
+    def __init__(self, questions: list[Question], master=None):
         super().__init__(master=master)
         self.grid()
         self._root().title(strings.TITLE)  # noqa
+        self.questions = questions
         self.answer_selection_map = dict()
         self.current_row = 0
 
-    def display_questionnaire(self, questions: list[Question]):
-        for question in questions:
+    def display_questionnaire(self):
+        for question in self.questions:
             self._display_question_text(question)
             answers = self._shuffle_answers(question)
             for answer in answers:
                 self._display_answer(answer)
-        self._display_buttons(questions)
+        self._display_buttons()
 
     def _display_question_text(self, question):
         ttk.Label(master=self, text="\n").grid(column=1, row=self.current_row)
@@ -40,43 +58,43 @@ class QuestionnaireUI(ttk.Frame):
     def _display_answer(self, answer):
         self.answer_selection_map[answer] = tk.IntVar()
         ttk.Checkbutton(
-            master=self, text=answer.text, variable=self.answer_selection_map[answer],
+            master=self,
+            text=answer.text,
+            variable=self.answer_selection_map[answer],
         ).grid(column=1, row=self.current_row)
         self.current_row += 1
 
-    def _display_buttons(self, questions):
+    def _display_buttons(self):
         ttk.Label(master=self, text="\n").grid(column=1, row=self.current_row)
         self.current_row += 1
         ttk.Button(
             master=self,
             text=strings.SHOW_RESULTS,
-            command=partial(self.show_results, questions),
+            command=self.show_results,
         ).grid(column=0, row=self.current_row)
         ttk.Button(master=self, text=strings.QUIT, command=self.quit).grid(
             column=2, row=self.current_row
         )  # self.destroy ?
         self.current_row += 1
 
-    def show_results(self, questions: list[Question]):
+    def show_results(self):
         selected_answers = self._collect_selected_answers()
-        self._check_all_questions_are_answered(questions, selected_answers)
-
-        # validator.validate_answers(questions, selected_answers)
-        print(selected_answers, questions)
-
-    @staticmethod
-    def _check_all_questions_are_answered(
-        questions: list[Question], selected_answers: list[Answer]
-    ):
         try:
             QuestionnaireValidator.check_all_questions_are_answered(
-                questions, selected_answers
+                self.questions, selected_answers
             )
         except UnansweredQuestionError:
-            messagebox.showerror(
-                strings.UNANSWERED_QUESTION_ERROR_TITLE,
-                strings.UNANSWERED_QUESTION_ERROR_MESSAGE,
-            )
+            self._show_error()
+        else:
+            validated_questions = QuestionnaireValidator.validate_answers(self.questions, selected_answers)
+            self.master.show_results(validated_questions)
+
+    @staticmethod
+    def _show_error():
+        messagebox.showerror(
+            strings.UNANSWERED_QUESTION_ERROR_TITLE,
+            strings.UNANSWERED_QUESTION_ERROR_MESSAGE,
+        )
 
     def _collect_selected_answers(self):
         selected_answers = []
@@ -85,3 +103,31 @@ class QuestionnaireUI(ttk.Frame):
             if is_selected:
                 selected_answers.append(answer)
         return selected_answers
+
+
+class ResultUI(ttk.Frame):
+    def __init__(self, validated_questions: list[ValidatedQuestion], master=None):
+        super().__init__(master=master)
+        self._root().title(strings.SHOW_RESULTS)  # noqa
+        self.grid()
+        self.validated_questions = validated_questions
+        self.row_index = 0
+
+    def display_results(self):
+        for validated_question in self.validated_questions:
+            question = validated_question.answered_question.question
+            ttk.Label(master=self, text=question.text).grid(column=0, row=self.row_index)
+            self.row_index += 1
+            if validated_question.is_correct:
+                answer_text = ",".join(answer.text for answer in validated_question.answered_question.user_answers)
+                ttk.Label(master=self, text=f"Your answer '{answer_text}' is correct").grid(column=1, row=self.row_index, padx=5)
+                self.row_index += 1
+            else:
+                answer_text = ",".join(answer.text for answer in validated_question.answered_question.user_answers)
+                ttk.Label(master=self, text=f"Your answer '{answer_text}' is wrong").grid(column=1,row=self.row_index, padx=5)
+                self.row_index += 1
+                correct_answer_text = ",".join(answer.text for answer in question.correct_answers)
+                ttk.Label(master=self, text=f"The correct answer is '{correct_answer_text}'").grid(column=1, row=self.row_index, padx=5)
+                self.row_index += 1
+
+
