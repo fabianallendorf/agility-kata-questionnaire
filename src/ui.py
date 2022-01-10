@@ -13,34 +13,49 @@ class QuestionnaireUI(ttk.Frame):
     def __init__(self, master=None):
         super().__init__(master=master)
         self.grid()
-        self._root().title(ui_strings.TITLE)  # noqa
-        self.check_vars = dict()
+        self._root().title(strings.TITLE)  # noqa
+        self.answer_selection_map = dict()
+        self.current_row = 0
 
     def display_questionnaire(self, questions: list[Question]):
-        row = 0
         for question in questions:
-            ttk.Label(master=self, text="\n").grid(column=1, row=row)
-            row += 1
-            ttk.Label(master=self, text=question.text).grid(column=1, row=row)
-            row += 1
-            answers = question.correct_answers + question.incorrect_answers
-            random.shuffle(answers)
+            self._display_question_text(question)
+            answers = self._shuffle_answers(question)
             for answer in answers:
-                self.check_vars[answer] = tk.IntVar()
-                ttk.Checkbutton(
-                    master=self, text=answer.text, variable=self.check_vars[answer]
-                ).grid(column=1, row=row)
-                row += 1
-        ttk.Label(master=self, text="\n").grid(column=1, row=row)
-        row += 1
+                self._display_answer(answer)
+        self._display_buttons(questions)
+
+    def _display_question_text(self, question):
+        ttk.Label(master=self, text="\n").grid(column=1, row=self.current_row)
+        self.current_row += 1
+        ttk.Label(master=self, text=question.text).grid(column=1, row=self.current_row)
+        self.current_row += 1
+
+    @staticmethod
+    def _shuffle_answers(question):
+        answers = question.correct_answers + question.incorrect_answers
+        random.shuffle(answers)
+        return answers
+
+    def _display_answer(self, answer):
+        self.answer_selection_map[answer] = tk.IntVar()
+        ttk.Checkbutton(
+            master=self, text=answer.text, variable=self.answer_selection_map[answer],
+        ).grid(column=1, row=self.current_row)
+        self.current_row += 1
+
+    def _display_buttons(self, questions):
+        ttk.Label(master=self, text="\n").grid(column=1, row=self.current_row)
+        self.current_row += 1
         ttk.Button(
             master=self,
             text=strings.SHOW_RESULTS,
             command=partial(self.show_results, questions),
-        ).grid(column=0, row=row)
+        ).grid(column=0, row=self.current_row)
         ttk.Button(master=self, text=strings.QUIT, command=self.quit).grid(
-            column=2, row=row
+            column=2, row=self.current_row
         )  # self.destroy ?
+        self.current_row += 1
 
     def show_results(self, questions: list[Question]):
         selected_answers = self._collect_selected_answers()
@@ -65,8 +80,8 @@ class QuestionnaireUI(ttk.Frame):
 
     def _collect_selected_answers(self):
         selected_answers = []
-        for answer, var in self.check_vars.items():
-            is_selected = var.get()
+        for answer, selection in self.answer_selection_map.items():
+            is_selected = selection.get()
             if is_selected:
                 selected_answers.append(answer)
         return selected_answers
