@@ -1,6 +1,5 @@
 import random
 import tkinter as tk
-from functools import partial
 from tkinter import messagebox, ttk
 
 from src import strings
@@ -210,7 +209,6 @@ class ResultUI(GridUIMixin, ttk.Frame):
 
     def display_results(self):
         self._display_score()
-
         for validated_question in self.validated_questions:
             question = validated_question.answered_question.question
             self.add_separator()
