@@ -3,7 +3,7 @@ import tkinter as tk
 from functools import partial
 from tkinter import ttk, messagebox
 
-from src import ui_strings
+from src import strings
 from src.dataclasses import Question, Answer
 from src.exceptions import UnansweredQuestionError
 from src.questionnaire_validator import QuestionnaireValidator
@@ -35,10 +35,10 @@ class QuestionnaireUI(ttk.Frame):
         row += 1
         ttk.Button(
             master=self,
-            text=ui_strings.SHOW_RESULTS,
+            text=strings.SHOW_RESULTS,
             command=partial(self.show_results, questions),
         ).grid(column=0, row=row)
-        ttk.Button(master=self, text=ui_strings.QUIT, command=self.quit).grid(
+        ttk.Button(master=self, text=strings.QUIT, command=self.quit).grid(
             column=2, row=row
         )  # self.destroy ?
 
@@ -59,8 +59,8 @@ class QuestionnaireUI(ttk.Frame):
             )
         except UnansweredQuestionError:
             messagebox.showerror(
-                ui_strings.UNANSWERED_QUESTION_ERROR_TITLE,
-                ui_strings.UNANSWERED_QUESTION_ERROR_MESSAGE,
+                strings.UNANSWERED_QUESTION_ERROR_TITLE,
+                strings.UNANSWERED_QUESTION_ERROR_MESSAGE,
             )
 
     def _collect_selected_answers(self):
