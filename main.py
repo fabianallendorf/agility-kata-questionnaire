@@ -9,6 +9,7 @@ from src.ui import MainUI
 def main():
     directory_path = Path(os.path.join(os.path.dirname(__file__), "test/files/"))
     file_dict = read_files(directory_path)
+
     questionnaires = QuestionnaireParser.parse_questionnaires(file_dict)
 
     ui = MainUI()

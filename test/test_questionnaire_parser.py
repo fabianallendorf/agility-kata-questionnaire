@@ -30,11 +30,12 @@ def questionnaire_lines():
 
 class TestQuestionnaireParser:
     def test_parse_questionnaire_parses_all_questions(self, questionnaire_lines):
-        questions = QuestionnaireParser.parse_questionnaire(
+        questionnaire = QuestionnaireParser.parse_questionnaire(
+            questionnaire_name="test_name",
             questionnaire_lines=questionnaire_lines
         )
 
-        assert len(questions) == 4
+        assert len(questionnaire.questions) == 4
 
     def test_parse_question_parses_multiple_answers(
         self,
@@ -91,17 +92,15 @@ class TestQuestionnaireParser:
                 "question_text", parsed_answers=parsed_answers
             )
 
-    def test_build_question_accepts_multiple_correct_answers(
-        self, questionnaire_lines
-    ):
+    def test_build_question_accepts_multiple_correct_answers(self, questionnaire_lines):
         parsed_answers = [
             (Answer(text="correct_answer"), True),
             (Answer(text="other_correct_answer"), True),
         ]
 
         question = QuestionnaireParser.build_question(
-                "question_text", parsed_answers=parsed_answers
-            )
+            "question_text", parsed_answers=parsed_answers
+        )
         assert len(question.correct_answers) == 2
 
     def test_build_question_returns_complete_question(self, questionnaire_lines):

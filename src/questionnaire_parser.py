@@ -9,17 +9,23 @@ from src import markers
 
 class QuestionnaireParser:
     @classmethod
-    def parse_questionnaires(cls, file_dict: dict[str, list[str]]) -> list[Questionnaire]:
+    def parse_questionnaires(
+        cls, file_dict: dict[str, list[str]]
+    ) -> list[Questionnaire]:
         questionnaires = []
         for name, lines in file_dict.items():
-            questionnaire = QuestionnaireParser.parse_questionnaire(questionnaire_name=name, questionnaire_lines=lines)
+            questionnaire = QuestionnaireParser.parse_questionnaire(
+                questionnaire_name=name, questionnaire_lines=lines
+            )
             if len(questionnaire.questions) == 0:
                 continue
             questionnaires.append(questionnaire)
         return questionnaires
 
     @classmethod
-    def parse_questionnaire(cls, questionnaire_name: str, questionnaire_lines: list[str]) -> Questionnaire:
+    def parse_questionnaire(
+        cls, questionnaire_name: str, questionnaire_lines: list[str]
+    ) -> Questionnaire:
         current_line_index = 0
         questions = []
         while True:
