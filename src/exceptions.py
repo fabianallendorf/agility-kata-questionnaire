@@ -14,5 +14,5 @@ class NotAQuestionError(Exception):
     pass
 
 
-class NotExactlyOneCorrectAnswerError(Exception):
+class NoCorrectAnswerError(Exception):
     pass

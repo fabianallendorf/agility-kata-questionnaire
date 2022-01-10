@@ -2,7 +2,7 @@ from src.dataclasses import Question, Answer
 from src.exceptions import (
     NotAnAnswerError,
     NotAQuestionError,
-    NotExactlyOneCorrectAnswerError,
+    NoCorrectAnswerError,
 )
 from src import markers
 
@@ -18,7 +18,7 @@ class QuestionnaireParser:
                     questionnaire_lines,
                     current_line_index,
                 )
-            except IndexError:
+            except (NotAQuestionError, IndexError):
                 break
             questions.append(question)
         return questions
@@ -84,8 +84,8 @@ class QuestionnaireParser:
             for answer, is_correct_for_current_question in parsed_answers
             if not is_correct_for_current_question
         ]
-        if len(correct_answers) != 1:
-            raise NotExactlyOneCorrectAnswerError
+        if len(correct_answers) < 1:
+            raise NoCorrectAnswerError
         return Question(
             text=question_text,
             correct_answers=correct_answers,

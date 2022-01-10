@@ -4,7 +4,7 @@ from src.dataclasses import Answer
 from src.exceptions import (
     NotAQuestionError,
     NotAnAnswerError,
-    NotExactlyOneCorrectAnswerError,
+    NoCorrectAnswerError,
 )
 from src.questionnaire_parser import QuestionnaireParser
 
@@ -86,12 +86,12 @@ class TestQuestionnaireParser:
             (Answer(text="answer"), False),
         ]
 
-        with pytest.raises(NotExactlyOneCorrectAnswerError):
+        with pytest.raises(NoCorrectAnswerError):
             QuestionnaireParser.build_question(
                 "question_text", parsed_answers=parsed_answers
             )
 
-    def test_build_question_errors_if_multiple_correct_answers(
+    def test_build_question_accepts_multiple_correct_answers(
         self, questionnaire_lines
     ):
         parsed_answers = [
@@ -99,10 +99,10 @@ class TestQuestionnaireParser:
             (Answer(text="other_correct_answer"), True),
         ]
 
-        with pytest.raises(NotExactlyOneCorrectAnswerError):
-            QuestionnaireParser.build_question(
+        question = QuestionnaireParser.build_question(
                 "question_text", parsed_answers=parsed_answers
             )
+        assert len(question.correct_answers) == 2
 
     def test_build_question_returns_complete_question(self, questionnaire_lines):
         parsed_answers = [

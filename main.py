@@ -1,20 +1,16 @@
-from importlib import resources
+import os
+from pathlib import Path
 
-import test.files
-from src.file_reader import read_file
-from src.questionnaire_parser import QuestionnaireParser
-from src.ui import QuestionnaireUI, MainUI
+from src.file_reader import read_files
+from src.ui import MainUI
 
 
 def main():
-    with resources.path(test.files, test.files.WITH_MULTIPLE_QUESTIONS) as path:
-        questionnaire_lines = read_file(path)
-
-    parser = QuestionnaireParser()
-    questions = parser.parse_questionnaire(questionnaire_lines=questionnaire_lines)
+    directory_path = Path(os.path.join(os.path.dirname(__file__), "test/files/"))
+    questionnaire_dict = read_files(directory_path)
 
     ui = MainUI()
-    ui.display_questionnaire(questions)
+    ui.display_questionnaire_selection(questionnaire_dict)
     ui.mainloop()
 
 

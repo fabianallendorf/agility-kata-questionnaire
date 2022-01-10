@@ -1,10 +1,12 @@
 import random
 import tkinter as tk
+from functools import partial
 from tkinter import ttk, messagebox
 
 from src import strings
 from src.dataclasses import Question, Answer, ValidatedQuestion
 from src.exceptions import UnansweredQuestionError
+from src.questionnaire_parser import QuestionnaireParser
 from src.questionnaire_validator import QuestionnaireValidator
 
 
@@ -12,6 +14,12 @@ class MainUI(tk.Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.page = None
+
+    def display_questionnaire_selection(self, questionnaire_dict):
+        if self.page:
+            self.page.destroy()
+        self.page = SelectionUI(questionnaire_dict, master=self)
+        self.page.display_questionnaire_selection()
 
     def display_questionnaire(self, questions):
         if self.page:
@@ -24,6 +32,59 @@ class MainUI(tk.Tk):
             self.page.destroy()
         self.page = ResultUI(validated_questions=validated_questions, master=self)
         self.page.display_results()
+
+
+class SelectionUI(ttk.Frame):
+    def __init__(self, questionnaire_dict: dict[str, list[str]], master=None):
+        super().__init__(master=master)
+        self._root().title(strings.SHOW_RESULTS)  # noqa
+        self.grid()
+        self.current_row = 0
+        self.questionnaire_dict = questionnaire_dict
+        self.questionnaire_selection = tk.StringVar()
+
+    def display_questionnaire_selection(self):
+        for questionnare_name in self.questionnaire_dict.keys():
+            self._display_questionnaire_information(questionnare_name)
+        self._display_buttons()
+
+    def _display_questionnaire_information(self, questionnaire_name: str):
+        ttk.Label(master=self, text="\n").grid(column=1, row=self.current_row)
+        self.current_row += 1
+        ttk.Radiobutton(
+            master=self,
+            text=questionnaire_name,
+            variable=self.questionnaire_selection,
+            value=questionnaire_name
+        ).grid(column=1, row=self.current_row)
+        self.current_row += 1
+
+    def _display_buttons(self):
+        ttk.Label(master=self, text="\n").grid(column=1, row=self.current_row)
+        self.current_row += 1
+        ttk.Button(
+            master=self,
+            text=strings.SELECT_QUESTIONNAIRE,
+            command=self._select_questionnaire,
+        ).grid(column=0, row=self.current_row)
+        ttk.Button(master=self, text=strings.QUIT, command=self.quit).grid(
+            column=2, row=self.current_row
+        )
+        self.current_row += 1
+
+    def _select_questionnaire(self):
+        selection = self.questionnaire_selection.get()
+        if not selection:
+            return
+        questionnaire_lines = self.questionnaire_dict[selection]
+        questions = QuestionnaireParser.parse_questionnaire(questionnaire_lines=questionnaire_lines)
+        if len(questions) == 0:
+            messagebox.showerror(
+                strings.NO_QUESTIONS_ERROR_TITLE,
+                strings.NO_QUESTIONS_ERROR_MESSAGE,
+            )
+            return
+        self.master.display_questionnaire(questions)
 
 
 class QuestionnaireUI(ttk.Frame):
@@ -74,7 +135,7 @@ class QuestionnaireUI(ttk.Frame):
         ).grid(column=0, row=self.current_row)
         ttk.Button(master=self, text=strings.QUIT, command=self.quit).grid(
             column=2, row=self.current_row
-        )  # self.destroy ?
+        )
         self.current_row += 1
 
     def show_results(self):
