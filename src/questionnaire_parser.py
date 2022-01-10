@@ -41,7 +41,7 @@ class QuestionnaireParser:
         questionnaire_lines: list[str],
         current_line_index: int,
     ) -> tuple[int, Question]:
-        current_line_index, question_text = cls.read_question_text(
+        current_line_index, question_text, is_required = cls.read_question_text(
             questionnaire_lines, current_line_index
         )
         parsed_answers = []
@@ -55,19 +55,24 @@ class QuestionnaireParser:
             except (NotAnAnswerError, IndexError):
                 break
             parsed_answers.append((answer, is_correct_for_current_question))
-        question = cls.build_question(question_text, parsed_answers)
+        question = cls.build_question(question_text, is_required, parsed_answers)
         return current_line_index, question
 
     @classmethod
     def read_question_text(
         cls, questionnaire_lines: list[str], current_line_index: int
-    ) -> tuple[int, str]:
+    ) -> tuple[int, str, bool]:
         txt = questionnaire_lines[current_line_index]
         if not cls._is_question(txt):
             raise NotAQuestionError
-        txt = txt[1:]
+        if cls._is_required(txt):
+            is_required = True
+            txt = txt[2:]
+        else:
+            is_required = False
+            txt = txt[1:]
         current_line_index += 1
-        return current_line_index, txt
+        return current_line_index, txt, is_required
 
     @classmethod
     def parse_answer(
@@ -84,7 +89,7 @@ class QuestionnaireParser:
 
     @staticmethod
     def build_question(
-        question_text: str, parsed_answers: list[tuple[Answer, bool]]
+        question_text: str, is_required: bool, parsed_answers: list[tuple[Answer, bool]]
     ) -> Question:
         correct_answers = [
             answer
@@ -100,6 +105,7 @@ class QuestionnaireParser:
             raise NoCorrectAnswerError
         return Question(
             text=question_text,
+            required=is_required,
             correct_answers=correct_answers,
             incorrect_answers=incorrect_answers,
         )
@@ -111,3 +117,11 @@ class QuestionnaireParser:
     @staticmethod
     def _is_correct(txt: str) -> bool:
         return txt.startswith(markers.CORRECT_ANSWER_MARKER)
+
+    @staticmethod
+    def _is_required(txt: str) -> bool:
+        return txt.startswith(markers.REQUIRED_QUESTION_MARKER)
+
+    @staticmethod
+    def _is_freeform(txt: str) -> bool:
+        return txt.startswith(markers.FREEFORM_ANSWER_MARKER)

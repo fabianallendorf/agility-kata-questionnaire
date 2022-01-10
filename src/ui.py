@@ -149,7 +149,10 @@ class QuestionnaireUI(GridUIMixin, ttk.Frame):
 
     def _display_question_text(self, question):
         self.add_separator()
-        self.add_label(text=question.text)
+        text = question.text
+        if question.required:
+            text = f"{text} (*)"
+        self.add_label(text=text)
 
     @staticmethod
     def _shuffle_answers(question):
@@ -214,14 +217,20 @@ class ResultUI(GridUIMixin, ttk.Frame):
         self._display_buttons()
 
     def _display_question(self, validated_question):
-        question = validated_question.answered_question.question
-        self.add_separator()
-        self.add_label(text=question.text)
+        self._display_question_text(validated_question)
         if validated_question.is_correct:
             self._display_correctly_answered(validated_question)
         else:
             self._display_incorrectly_answered(validated_question)
-            self._display_correct_answer(question)
+            self._display_correct_answer(validated_question)
+
+    def _display_question_text(self, validated_question: ValidatedQuestion):
+        self.add_separator()
+        question = validated_question.answered_question.question
+        text = question.text
+        if question.required:
+            text = f"{text} (*)"
+        self.add_label(text=text)
 
     def _display_correctly_answered(self, validated_question: ValidatedQuestion):
         answer_text = ", ".join(
@@ -235,9 +244,9 @@ class ResultUI(GridUIMixin, ttk.Frame):
         )
         self.add_label(text=strings.incorrectly_answered(answer_text))
 
-    def _display_correct_answer(self, question):
+    def _display_correct_answer(self, validated_question: ValidatedQuestion):
         correct_answer_text = ", ".join(
-            answer.text for answer in question.correct_answers
+            answer.text for answer in validated_question.answered_question.question.correct_answers
         )
         self.add_label(text=strings.corrected_answer(correct_answer_text))
 

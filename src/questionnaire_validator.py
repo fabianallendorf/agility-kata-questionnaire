@@ -10,6 +10,9 @@ class QuestionnaireValidator:
         questions: list[Question], selected_answers: list[Answer]
     ):
         for question in questions:
+            if not question.required:
+                continue
+
             possible_answers = chain(
                 question.correct_answers, question.incorrect_answers
             )

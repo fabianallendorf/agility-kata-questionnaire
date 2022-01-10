@@ -3,7 +3,7 @@ QUIT = "Abandon hope"
 SELECT_QUESTIONNAIRE = "Choose hope"
 
 UNANSWERED_QUESTION_ERROR_TITLE = "Missing answer"
-UNANSWERED_QUESTION_ERROR_MESSAGE = "Some questions were not answered."
+UNANSWERED_QUESTION_ERROR_MESSAGE = "Some required questions were not answered."
 
 QUESTIONNAIRE_SELECTION_TITLE = "Questionnaire selection"
 QUESTIONNAIRE_SELECTION_INFO = "Please choose a questionnaire from the following list:"

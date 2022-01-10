@@ -11,6 +11,7 @@ class Answer:
 @dataclass(frozen=True)
 class Question:
     text: str
+    required: bool
     correct_answers: list[Answer]
     incorrect_answers: list[Answer]
     id: UUID = field(default_factory=uuid4)

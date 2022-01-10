@@ -54,7 +54,7 @@ class TestQuestionnaireParser:
             )
 
     def test_read_question_text_returns_correct_text(self, questionnaire_lines):
-        _, question_text = QuestionnaireParser.read_question_text(
+        _, question_text, _ = QuestionnaireParser.read_question_text(
             questionnaire_lines=questionnaire_lines, current_line_index=0
         )
 
@@ -84,7 +84,7 @@ class TestQuestionnaireParser:
 
         with pytest.raises(NoCorrectAnswerError):
             QuestionnaireParser.build_question(
-                "question_text", parsed_answers=parsed_answers
+                "question_text", False, parsed_answers=parsed_answers
             )
 
     def test_build_question_accepts_multiple_correct_answers(self, questionnaire_lines):
@@ -94,7 +94,7 @@ class TestQuestionnaireParser:
         ]
 
         question = QuestionnaireParser.build_question(
-            "question_text", parsed_answers=parsed_answers
+            "question_text", False, parsed_answers=parsed_answers
         )
         assert len(question.correct_answers) == 2
 
@@ -106,7 +106,7 @@ class TestQuestionnaireParser:
         ]
 
         question = QuestionnaireParser.build_question(
-            "question_text", parsed_answers=parsed_answers
+            "question_text", False, parsed_answers=parsed_answers
         )
 
         assert question.text == "question_text"
