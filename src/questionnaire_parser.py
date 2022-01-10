@@ -4,7 +4,7 @@ from src.exceptions import (
     NotAQuestionError,
     NotExactlyOneCorrectAnswerError,
 )
-from src import markers
+from src import markers, strings
 
 
 class QuestionnaireParser:
@@ -84,6 +84,7 @@ class QuestionnaireParser:
             for answer, is_correct_for_current_question in parsed_answers
             if not is_correct_for_current_question
         ]
+        incorrect_answers.append(Answer(text=strings.DONT_KNOW))
         if len(correct_answers) != 1:
             raise NotExactlyOneCorrectAnswerError
         return Question(
