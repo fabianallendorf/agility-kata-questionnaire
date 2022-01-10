@@ -45,13 +45,12 @@ class GridUIMixin:
         return element
 
     def add_separator(self, column=0, orient="horizontal", *args, **kwargs):
-        element = ttk.Separator(
-            master=self, orient=orient, *args, **kwargs
-        ).grid(  # noqa
+        ttk.Separator(
+            master=self, orient=orient, *args, **kwargs  # noqa
+        ).grid(
             column=column, row=self.current_row, sticky="ew", pady=10
         )
         self.current_row += 1
-        return element
 
 
 class MainUI(tk.Tk):
