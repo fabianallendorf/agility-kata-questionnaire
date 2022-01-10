@@ -50,9 +50,13 @@ class QuestionnaireUI(ttk.Frame):
         print(selected_answers, questions)
 
     @staticmethod
-    def _check_all_questions_are_answered(questions: list[Question], selected_answers: list[Answer]):
+    def _check_all_questions_are_answered(
+        questions: list[Question], selected_answers: list[Answer]
+    ):
         try:
-            QuestionnaireValidator.check_all_questions_are_answered(questions, selected_answers)
+            QuestionnaireValidator.check_all_questions_are_answered(
+                questions, selected_answers
+            )
         except UnansweredQuestionError:
             messagebox.showerror(
                 ui_strings.UNANSWERED_QUESTION_ERROR_TITLE,

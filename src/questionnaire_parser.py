@@ -7,61 +7,65 @@ from src.exceptions import (
 
 
 class QuestionnaireParser:
-    def __init__(self):
-        self.current_line_index = 0
-        self.max_line_index = 0
-
-    def parse_questionnaire(self, questionnaire_lines: list[str]) -> list[Question]:
+    @classmethod
+    def parse_questionnaire(cls, questionnaire_lines: list[str]) -> list[Question]:
         questions = []
-        self.current_line_index = 0
-        self.max_line_index = len(questionnaire_lines)
-        while self.current_line_index < self.max_line_index:
-            question = self.parse_question(questionnaire_lines)
+        current_line_index = 0
+        max_line_index = len(questionnaire_lines)
+        while current_line_index < max_line_index:
+            current_line_index, question = cls.parse_question(
+                questionnaire_lines, current_line_index, max_line_index
+            )
             questions.append(question)
         return questions
 
+    @classmethod
     def parse_question(
-        self,
+        cls,
         questionnaire_lines: list[str],
-    ) -> Question:
-        parsed_lines_count, question_text = self.read_question_text(questionnaire_lines)
-        self.current_line_index += parsed_lines_count
+        current_line_index: int,
+        max_line_index: int,
+    ) -> tuple[int, Question]:
+        current_line_index, question_text = cls.read_question_text(
+            questionnaire_lines, current_line_index
+        )
         parsed_answers = []
-        while self.current_line_index < self.max_line_index:
+        while current_line_index < max_line_index:
             try:
                 (
-                    parsed_lines_count,
+                    current_line_index,
                     answer,
                     is_correct_for_current_question,
-                ) = self.parse_answer(questionnaire_lines)
+                ) = cls.parse_answer(questionnaire_lines, current_line_index)
             except NotAnAnswerError:
                 break
-            self.current_line_index += parsed_lines_count
             parsed_answers.append((answer, is_correct_for_current_question))
-        question = self.build_question(question_text, parsed_answers)
-        return question
+        question = cls.build_question(question_text, parsed_answers)
+        return current_line_index, question
 
+    @classmethod
     def read_question_text(
-        self,
-        questionnaire_lines: list[str],
+        cls, questionnaire_lines: list[str], current_line_index: int
     ) -> tuple[int, str]:
-        txt = questionnaire_lines[self.current_line_index]
-        if not self._is_question(txt):
+        txt = questionnaire_lines[current_line_index]
+        if not cls._is_question(txt):
             raise NotAQuestionError
         txt = txt[1:]
-        return 1, txt
+        current_line_index += 1
+        return current_line_index, txt
 
+    @classmethod
     def parse_answer(
-        self,
-        questionnaire_lines: list[str],
+        cls, questionnaire_lines: list[str], current_line_index: int
     ) -> tuple[int, Answer, bool]:
-        txt = questionnaire_lines[self.current_line_index]
-        if self._is_question(txt):
+        txt = questionnaire_lines[current_line_index]
+        if cls._is_question(txt):
             raise NotAnAnswerError
-        is_correct = self._is_correct(txt)
-        if is_correct:
+        is_correct_for_current_question = cls._is_correct(txt)
+        if is_correct_for_current_question:
             txt = txt[1:]
-        return 1, Answer(text=txt), is_correct
+        current_line_index += 1
+        return current_line_index, Answer(text=txt), is_correct_for_current_question
 
     @staticmethod
     def _is_question(txt: str) -> bool:
