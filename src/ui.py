@@ -86,7 +86,9 @@ class QuestionnaireUI(ttk.Frame):
         except UnansweredQuestionError:
             self._show_error()
         else:
-            validated_questions = QuestionnaireValidator.validate_answers(self.questions, selected_answers)
+            validated_questions = QuestionnaireValidator.validate_answers(
+                self.questions, selected_answers
+            )
             self.master.show_results(validated_questions)
 
     @staticmethod
@@ -116,18 +118,45 @@ class ResultUI(ttk.Frame):
     def display_results(self):
         for validated_question in self.validated_questions:
             question = validated_question.answered_question.question
-            ttk.Label(master=self, text=question.text).grid(column=0, row=self.row_index)
+            ttk.Label(master=self, text=question.text).grid(
+                column=1, row=self.row_index
+            )
             self.row_index += 1
             if validated_question.is_correct:
-                answer_text = ",".join(answer.text for answer in validated_question.answered_question.user_answers)
-                ttk.Label(master=self, text=f"Your answer '{answer_text}' is correct").grid(column=1, row=self.row_index, padx=5)
+                self._display_correctly_answered(validated_question)
                 self.row_index += 1
             else:
-                answer_text = ",".join(answer.text for answer in validated_question.answered_question.user_answers)
-                ttk.Label(master=self, text=f"Your answer '{answer_text}' is wrong").grid(column=1,row=self.row_index, padx=5)
+                self._display_incorrectly_answered(validated_question)
                 self.row_index += 1
-                correct_answer_text = ",".join(answer.text for answer in question.correct_answers)
-                ttk.Label(master=self, text=f"The correct answer is '{correct_answer_text}'").grid(column=1, row=self.row_index, padx=5)
+                self._display_correct_answer(question)
                 self.row_index += 1
+            self._display_separator()
+            self.row_index += 1
 
+    def _display_separator(self):
+        separator = ttk.Separator(master=self, orient="horizontal")
+        separator.grid(column=1, sticky="ew", pady=10)
 
+    def _display_correctly_answered(self, validated_question: ValidatedQuestion):
+        answer_text = ",".join(
+            answer.text for answer in validated_question.answered_question.user_answers
+        )
+        ttk.Label(master=self, text=f"Your answer '{answer_text}' is correct").grid(
+            column=1, row=self.row_index
+        )
+
+    def _display_incorrectly_answered(self, validated_question: ValidatedQuestion):
+        answer_text = ",".join(
+            answer.text for answer in validated_question.answered_question.user_answers
+        )
+        ttk.Label(master=self, text=f"Your answer '{answer_text}' is wrong").grid(
+            column=1, row=self.row_index
+        )
+
+    def _display_correct_answer(self, question):
+        correct_answer_text = ",".join(
+            answer.text for answer in question.correct_answers
+        )
+        ttk.Label(
+            master=self, text=f"The correct answer is '{correct_answer_text}'"
+        ).grid(column=1, row=self.row_index)
