@@ -1,6 +1,6 @@
-from src import markers
 from src.dataclasses import Answer, Question, Questionnaire
 from src.exceptions import NoCorrectAnswerError, NotAnAnswerError, NotAQuestionError
+from src import markers, strings
 
 
 class QuestionnaireParser:
@@ -96,6 +96,7 @@ class QuestionnaireParser:
             for answer, is_correct_for_current_question in parsed_answers
             if not is_correct_for_current_question
         ]
+        incorrect_answers.append(Answer(text=strings.DONT_KNOW))
         if len(correct_answers) < 1:
             raise NoCorrectAnswerError
         return Question(
