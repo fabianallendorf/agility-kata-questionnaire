@@ -121,7 +121,3 @@ class QuestionnaireParser:
     @staticmethod
     def _is_required(txt: str) -> bool:
         return txt.startswith(markers.REQUIRED_QUESTION_MARKER)
-
-    @staticmethod
-    def _is_freeform(txt: str) -> bool:
-        return txt.startswith(markers.FREEFORM_ANSWER_MARKER)
