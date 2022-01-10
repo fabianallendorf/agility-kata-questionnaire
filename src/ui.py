@@ -11,19 +11,19 @@ from src.questionnaire_validator import QuestionnaireValidator
 class MainUI(tk.Tk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.questionnaire = None
-        self.results = None
+        self.page = None
 
     def display_questionnaire(self, questions):
-        self.questionnaire = QuestionnaireUI(questions=questions, master=self)
-        self.questionnaire.display_questionnaire()
+        if self.page:
+            self.page.destroy()
+        self.page = QuestionnaireUI(questions=questions, master=self)
+        self.page.display_questionnaire()
 
     def show_results(self, validated_questions: list[ValidatedQuestion]):
-        if self.questionnaire:
-            self.questionnaire.destroy()
-            self.questionnaire = None
-        self.results = ResultUI(validated_questions=validated_questions, master=self)
-        self.results.display_results()
+        if self.page:
+            self.page.destroy()
+        self.page = ResultUI(validated_questions=validated_questions, master=self)
+        self.page.display_results()
 
 
 class QuestionnaireUI(ttk.Frame):
