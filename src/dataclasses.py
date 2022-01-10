@@ -28,7 +28,7 @@ class ValidatedQuestion:
     is_correct: bool
 
 
-@dataclass
+@dataclass(frozen=True)
 class Score:
     questions_count: int
     correct_questions_count: int
