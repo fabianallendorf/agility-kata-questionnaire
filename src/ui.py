@@ -22,7 +22,7 @@ class GridUIMixin:
         self.current_row += 1
         return element
 
-    def add_menu_button(self, column=0, *args, **kwargs):
+    def add_button(self, column=0, *args, **kwargs):
         element = ttk.Button(master=self, *args, **kwargs).grid(  # noqa
             column=column, row=self.current_row
         )
@@ -106,11 +106,11 @@ class SelectionUI(GridUIMixin, ttk.Frame):
 
     def _display_buttons(self):
         self.add_separator()
-        self.add_menu_button(
+        self.add_button(
             text=strings.SELECT_QUESTIONNAIRE,
             command=self._select_questionnaire,
         )
-        self.add_menu_button(text=strings.QUIT, command=self.quit)
+        self.add_button(text=strings.QUIT, command=self.quit)
 
     def _select_questionnaire(self):
         selection = self.questionnaire_selection.get()
@@ -163,8 +163,8 @@ class QuestionnaireUI(GridUIMixin, ttk.Frame):
 
     def _display_buttons(self):
         self.add_separator()
-        self.add_menu_button(text=strings.SHOW_RESULTS, command=self.show_results)
-        self.add_menu_button(text=strings.QUIT, command=self.quit)
+        self.add_button(text=strings.SHOW_RESULTS, command=self.show_results)
+        self.add_button(text=strings.QUIT, command=self.quit)
 
     def show_results(self):
         questions = self.questionnaire.questions
@@ -248,4 +248,4 @@ class ResultUI(GridUIMixin, ttk.Frame):
 
     def _display_buttons(self):
         self.add_separator()
-        self.add_menu_button(text=strings.QUIT, command=self.quit)
+        self.add_button(text=strings.QUIT, command=self.quit)
